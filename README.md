@@ -281,3 +281,9 @@ git pull --no-edit
 
 git push
 ```
+
+One last command... 
+```
+cowsay -f milk "Tada! You did it! Great Job"
+```
+
