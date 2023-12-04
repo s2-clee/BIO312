@@ -8,6 +8,7 @@ to make a new directory in lab03-s2-clee:
 > cd labs/lab03-s2-clee/
 
 > mkdir ~/labs/lab03-s2-clee/recombinases
+
 ; to make new directory folder
 > cd ~/labs/lab03-s2-clee/recombinases/
 
@@ -25,3 +26,20 @@ combinases.blastp.detail.out
 ; to create a new file "recombinases.blastp.detail.out" that tables the information from "recombinases.blastp.typical.out"
 > less -S recombinases.blastp.detail.out
 ; to open and check the file was a table	
+
+Sorting
+> awk '{if ($6< 1e-35)print $1 }' recombinases.blastp.detail.out > recombinases.blastp.detail.filtered.out
+
+; to filter out e values less than 1e-35 and puts information in a new folder called "recombinases.blastp.detail.filtered.out"
+
+> wc -l recombinases.blastp.detail.filtered.out
+
+; to find how many lines are in the filtered file
+
+> wc -l recombinases.blastp.detail.out  
+
+; to find how many lines are in the unfiltered file
+
+>  grep -o -E "^[A-Z]\.[a-z]+" recombinases.blastp.detail.filtered.out  | sort | uniq -c 
+
+; to alphabetasize the filtered file and find how many hits were found for each organism
