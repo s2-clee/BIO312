@@ -1,9 +1,9 @@
-# `#0969DA` BIO312- Extra Credit
+# BIO312- Extra Credit
 
 ## _This is a complilation of all the commands I used to do my analysis of NP_008999.2 aka DNA meiotic recombinase 1 (DMC1)_
 
 ### Finding homologs with BLAST KEY ; "Lab 3"
-_the main goal of this lab is to find and align gene family homologs using NP_008999.2_ 
+_the purpose of this lab is to find and align gene family homologs using NP_008999.2_ 
 to make a new directory in lab03-s2-clee: 
 ```
 cd labs/lab03-s2-clee/
@@ -64,7 +64,7 @@ git push
 ```
 
 ### Gene family sequence alignment; "Lab 4"
-_the main goal of this lab is to perform a global multiple sequence alignment in MUSCLE and then calculate the length and the average percent identity among all sequences in the alignment_
+_the purpose of this lab is to perform a global multiple sequence alignment in MUSCLE and then calculate the length and the average percent identity among all sequences in the alignment_
 to make a new directory in lab03-s2-clee: 
 ```
 mkdir ~/labs/lab04-$MYGIT/recombinases
@@ -117,10 +117,110 @@ alignbuddy -pi ~/labs/lab04-$MYGIT/recombinases/recombinases.homologs.al.fas | a
 Save & Quit
 ```
 history > lab4.commandhistory.txt
+
 cd ~/labs/lab04-$MYGIT`
+
 find . -size +5M | sed 's|^\./||g' | cat >> .gitignore; awk '!NF || !seen[$0]++' .gitignore
+
 git add .
+
 git commit -a -m "[YOUR DESCRIPTION]"
+
 git pull --no-edit
+
+git push
+```
+
+### Gene family phylogeny using IQ-TREE; "Lab 5"
+_the purpose of this lab is to estimate a maximum-likelihood, midpoint rooted phylogeny for the gene family_
+to make a new directory in lab05-s2-clee: 
+```
+mkdir ~/labs/lab05-$MYGIT/recombinases
+
+cd ~/labs/lab05-$MYGIT/recombinases
+
+cp ~/labs/lab04-$MYGIT/recombinases/recombinases.homologs.al.fas ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.fas   
+```
+To use IQ-TREE to calculate the optimal amino acid substitution model and amino acid frequencies and then tree search, estimating branch lengths as it goes:
+```
+iqtree -s ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.fas -bb 1000 -nt 2 
+```
+Read as newick formatted:
+```
+nw_display ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.fas.treefile
+```
+Looking at the tree unrooted with small text labels:
+```
+Rscript --vanilla ~/labs/lab05-$MYGIT/plotUnrooted.R  ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.fas.treefile ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.fas.treefile.pdf 0.4 15
+```
+Midpoint rooting and viewing it in newick formatting and as a graphic:
+```
+gotree reroot midpoint -i ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.fas.treefile -o ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile
+
+nw_order -c n ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile  | nw_display -
+
+nw_order -c n ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile | nw_display -w 1000 -b 'opacity:0' -s  >  ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile.svg -
+```
+Viewing as a cladogram:
+```
+nw_order -c n ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile | nw_topology - |
+
+nw_display -s  -w 1000 > ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.midCl.treefile.svg -
+```
+Printing alignment into pdf; used iTOL tree to create this as an svg:
+```
+Rscript --vanilla ~/labs/lab05-$MYGIT/plotMSA.R  ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.fas ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.fas.pdf
+```
+Save & Quit:
+```
+history > lab5.commandhistory.txt
+
+cd ~/labs/lab05-$MYGIT
+
+find . -size +5M | sed 's|^\./||g' | cat >> .gitignore; awk '!NF || !seen[$0]++' .gitignore
+
+git add .
+
+git commit -a -m "Adding all new data files I generated in AWS to the repository."
+
+git pull --no-edit
+
+git push
+```
+
+### Reconciling a gene and species tree; "Lab 6"
+_the purpose of this lab is to reconcile in Notung the gene family tree based on the midpoint rooted tree from lab 5_
+to make a new directory in lab06-s2-clee: 
+```
+mkdir ~/labs/lab06-$MYGIT/mygenefamily
+
+cp ~/labs/lab05-$MYGIT/mygenefamily/mygenefamily.homologs.al.mid.treefile ~/labs/lab06-$MYGIT/mygenefamily/mygenefamily.homologs.al.mid.treefile
+```
+Reconciling the gene and species tree using Notung with names assigned to the internal nodes:
+```
+java -jar ~/tools/Notung-3.0-beta/Notung-3.0-beta.jar -s ~/labs/lab06-$MYGIT/species.tre -g ~/labs/lab06-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile --reconcile --speciestag prefix --savepng --events --outputdir ~/labs/lab06-$MYGIT/recombinases/
+
+grep NOTUNG-SPECIES-TREE ~/labs/lab06-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile.reconciled | sed -e "s/^\[&&NOTUNG-SPECIES-TREE//" -e "s/\]/;/" | nw_display -
+```
+generate a RecPhyloXML object and the gene-within-species tree via thirdkind:
+```
+python2.7 ~/tools/recPhyloXML/python/NOTUNGtoRecPhyloXML.py -g ~/labs/lab06-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile.reconciled --include.species
+
+thirdkind -Iie -D 40 -f ~/labs/lab06-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile.reconciled.xml -o  ~/labs/lab06-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile.reconciled.svg
+```
+Save & Quit
+```
+history > lab6.commandhistory.txt
+
+cd ~/labs/lab06-$MYGIT`
+
+find . -size +5M | sed 's|^\./||g' | cat >> .gitignore; awk '!NF || !seen[$0]++' .gitignore
+
+git add .
+
+git commit -a -m "[YOUR DESCRIPTION]"
+
+git pull --no-edit
+
 git push
 ```
