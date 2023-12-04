@@ -224,3 +224,60 @@ git pull --no-edit
 
 git push
 ```
+
+### Protein Domain Prediction; "Lab 8"
+_the purpose of this lab is to identify gene motifs and domains using RPS-BLAST and Pfam_
+to make a new directory in lab08-s2-clee: 
+```
+mkdir ~/labs/lab08-$MYGIT/recombinases && cd ~/labs/lab08-$MYGIT/recombinases
+
+cp ~/labs/lab05-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile ~/labs/lab08-$MYGIT/recombinases
+```
+make a copy of our raw unaligned sequence, removing the asterisk (stop codon) in the process. To do this, we will use sed's substitute command to substitute any instance of an asterisk with nothing.
+```
+sed 's/*//' ~/labs/lab04-$MYGIT/recombinases/recombinases.homologs.fas > ~/labs/lab08-$MYGIT/recombinases/recombinases.homologs.fas
+ ```
+enable functional analysis of proteins by classifying them into families and predicting domains and important sites:
+```
+wget -O ~/data/Pfam_LE.tar.gz ftp://ftp.ncbi.nih.gov/pub/mmdb/cdd/little_endian/Pfam_LE.tar.gz && tar xfvz ~/data/Pfam_LE.tar.gz  -C ~/data
+```
+To alphabetically list the species in a table with a 1x10^-10 e-threshold for saving hits. In the table, there is the query sequence length, start and end of alignment of each subject, the e value, and subject title. This was also repeated with a different e-value (0.1) to see if it will fix the missing domains 
+```
+rpsblast -query ~/labs/lab08-$MYGIT/recombinases/recombinases.homologs.fas -db ~/data/Pfam -out ~/labs/lab08-$MYGIT/recombinases/recombinases.rps-blast.out  -outfmt "6 qseqid qlen qstart qend evalue stitle" -evalue .0000000001
+
+rpsblast -query ~/labs/lab08-$MYGIT/recombinases/recombinases.homologs.fas -db ~/data/Pfam -out ~/labs/lab08-$MYGIT/recombinases/recombinases.rps-blast.out-e.1  -outfmt "6 qseqid qlen qstart qend evalue stitle" -evalue .1
+```
+Plot the predicted Pfam domains on the phylogenetic tree:
+```
+sudo /usr/local/bin/Rscript  --vanilla ~/labs/lab08-$MYGIT/plotTreeAndDomains.r ~/labs/lab08-$MYGIT/recombinases/recombinases.homologs.al.mid.treefile ~/labs/lab08-$MYGIT/recombinases/recombinases.rps-blast.out ~/labs/lab08-$MYGIT/recombinases/recombinases.tree.rps.pdf
+```
+Looking at the predicted domains with more details:
+```
+mlr --inidx --ifs "\t" --opprint  cat ~/labs/lab08-$MYGIT/recombinases/recombinases.rps-blast.out | tail -n +2 | less -S
+```
+Finding which proteins have more than one annotation, which Pfam domain annotation is most commonly found, the shortest/longest annotated protein domain, and the best e-value:
+```
+cut -f 1 ~/labs/lab08-$MYGIT/recombinases/recombinases.rps-blast.out | sort | uniq -c
+
+cut -f 6 ~/labs/lab08-$MYGIT/recombinases/recombinases.rps-blast.out | sort | uniq -c
+
+awk '{a=$4-$3;print $1,'\t',a;}' ~/labs/lab08-$MYGIT/recombinases/recombinases.rps-blast.out |  sort  -k2nr
+
+cut -f 1,5 -d $'\t' ~/labs/lab08-$MYGIT/recombinases/recombinases.rps-blast.out | sort -k2,2rn -t $'\t' 
+```
+Save & Quit
+```
+history > lab8.commandhistory.txt
+
+cd ~/labs/lab08-$MYGIT`
+
+find . -size +5M | sed 's|^\./||g' | cat >> .gitignore; awk '!NF || !seen[$0]++' .gitignore
+
+git add .
+
+git commit -a -m "[YOUR DESCRIPTION]"
+
+git pull --no-edit
+
+git push
+```
