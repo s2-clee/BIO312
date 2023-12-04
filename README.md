@@ -1,4 +1,4 @@
-###** BIO312- Extra Credit **
+### ** BIO312- Extra Credit **
 ## This is a complilation of all the commands I used to do my analysis of NP_008999.2 aka DNA meiotic recombinase 1 (DMC1)
 
 # Finding homologs with BLAST KEY ; this was done in Lab 3 for me
