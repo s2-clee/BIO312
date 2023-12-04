@@ -6,8 +6,11 @@
 _the main goal of this lab is to find and align gene family homologs using NP_008999.2_ 
 to make a new directory in lab03-s2-clee: 
 > cd from globins to return back to home
+
 > cd labs/lab03-s2-clee/ ; to go into lab03
+
 > mkdir ~/labs/lab03-s2-clee/recombinases ; to make new directory folder
+
 > cd ~/labs/lab03-s2-clee/recombinases/ ; go into new folder "recombinases"
 > pwd ; check where you are
 	
